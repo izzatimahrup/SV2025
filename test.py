@@ -265,15 +265,9 @@ else:
     st.warning("Insufficient data points in one or both coaching groups to perform a reliable T-test.")
 
 
-# --- 5. Bar Chart: Distribution of Academic Years ---
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-# Assuming arts_df is already loaded and available from your URL code
-
-# --- Academic Year Distribution Chart (Plotly Conversion with Auto-Detection) ---
-
-st.subheader("Distribution of Academic Years (Student Count) 🎓")
+# ----------------------------------------------------------------------
+# --- 7. Bar Chart: Distribution of Academic Years ---
+st.subheader("7. Distribution of Academic Years (Student Count)")
 
 # Try to find the correct column automatically (using the provided logic)
 academic_year_col = None
