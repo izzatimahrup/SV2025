@@ -12,28 +12,30 @@ st.set_page_config(
 
 st.title("Arts Faculty Data Analysis and Visualization 📊")
 
-# --- 1. Comprehensive Data Preparation (Replace with your actual data loading) ---
+# ######################################################################
+# --- 1. DATA LOADING AND INITIAL PREPARATION (REPLACED WITH YOUR URL CODE) ---
 
-# Example data for demonstration purposes, including all necessary columns
-data = {
-    'Gender': ['Female', 'Male', 'Female', 'Non-Binary', 'Male', 'Female', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male'],
-    'Arts Program': ['English', 'Philosophy', 'History', 'English', 'Philosophy', 'History', 'English', 'English', 'Philosophy', 'English', 'History', 'Philosophy'],
-    'semester 1st year 1st semester GPA': [3.5, 3.8, 3.2, 3.9, 3.1, 3.7, 3.4, 3.6, 3.9, 3.5, 3.3, 3.7],
-    'semester 1st year 2nd semester GPA': [3.4, 3.9, 3.1, 3.8, 3.0, 3.6, 3.5, 3.7, 3.8, 3.4, 3.2, 3.6],
-    'S.S.C (GPA)': [4.5, 5.0, 4.0, 5.0, 4.2, 4.8, 4.6, 4.9, 5.0, 4.5, 4.1, 4.7], # 5.0 scale
-    'H.S.C (GPA)': [4.2, 4.8, 3.9, 4.9, 4.0, 4.7, 4.5, 4.7, 4.9, 4.1, 3.8, 4.6], # 5.0 scale
-    'Did you ever attend a Coaching center?': ['Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No', 'Yes', 'No'],
-    'Academic Year in EU': ['1st Year', '2nd Year', '3rd Year', '4th Year', '1st Year', '2nd Year', '3rd Year', '4th Year', '1st Year', '2nd Year', '3rd Year', '4th Year']
-}
-arts_df = pd.DataFrame(data)
+url = 'https://raw.githubusercontent.com/izzatimahrup/SV2025/refs/heads/main/arts_student_survey_output.csv'
 
-# --- Data Cleaning and Calculation for all charts ---
+try:
+    # Load the CSV directly from the URL and assign it to arts_df
+    arts_df = pd.read_csv(url)
+    st.success("Data loaded successfully from GitHub URL!")
+except Exception as e:
+    st.error(f"An error occurred while reading the CSV from the URL: {e}")
+    st.stop() # Stop the app if data loading fails
+
+# ######################################################################
+
+
+# --- Data Cleaning and Calculation (Keep this section) ---
+# This section prepares the data structure required by the charts
 gpa_cols = [col for col in arts_df.columns if "semester" in col.lower()]
 arts_df[gpa_cols] = arts_df[gpa_cols].apply(pd.to_numeric, errors='coerce')
 arts_df['Overall_Average_GPA'] = arts_df[gpa_cols].mean(axis=1, skipna=True)
 arts_df['S.S.C (GPA)_norm'] = (pd.to_numeric(arts_df['S.S.C (GPA)'], errors='coerce') / 5.0) * 4.0
 arts_df['H.S.C (GPA)_norm'] = (pd.to_numeric(arts_df['H.S.C (GPA)'], errors='coerce') / 5.0) * 4.0
-arts_df['Did you ever attend a Coaching center?'] = arts_df['Did you ever attend a Coaching center?'].str.strip().str.title()
+arts_df['Did you ever attend a Coaching center?'] = arts_df['Did you ever attend a Coaching center?'].astype(str).str.strip().str.title()
 # ----------------------------------------------------------------------
 
 
@@ -278,6 +280,4 @@ if len(yes_group) > 1 and len(no_group) > 1:
     if p_value < 0.05:
         st.success("✅ The difference between groups is statistically significant (p < 0.05).")
     else:
-        st.info("⚖️ No statistically significant difference between coaching and non-coaching students.")
-else:
-    st.warning("Insufficient data points in one or both coaching groups to perform a reliable T-test.")
+        st.info("⚖️ No statistically significant difference between coaching and non-coaching students
