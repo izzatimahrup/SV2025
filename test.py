@@ -13,7 +13,7 @@ st.set_page_config(
 st.header("Arts Faculty Data Analysis and Visualization 📊", divider="blue")
 
 # ######################################################################
-# --- 1. DATA LOADING FROM URL (REPLACED DUMMY DATA) ---
+# --- 1. DATA LOADING FROM URL ---
 url = 'https://raw.githubusercontent.com/izzatimahrup/SV2025/refs/heads/main/arts_student_survey_output.csv'
 
 try:
@@ -26,7 +26,8 @@ except Exception as e:
 # ######################################################################
 
 
-# --- Perform necessary data cleaning and calculation for all charts (KEPT) ---
+# --- Perform necessary data cleaning and calculation for all charts ---
+
 # 1. GPA Calculations
 gpa_cols = [col for col in arts_df.columns if "semester" in col.lower()]
 arts_df[gpa_cols] = arts_df[gpa_cols].apply(pd.to_numeric, errors='coerce')
@@ -38,6 +39,9 @@ arts_df['H.S.C (GPA)_norm'] = (pd.to_numeric(arts_df['H.S.C (GPA)'], errors='coe
 
 # 3. Clean Coaching Center column
 arts_df['Did you ever attend a Coaching center?'] = arts_df['Did you ever attend a Coaching center?'].astype(str).str.strip().str.title()
+
+# 4. Corrected Academic Year column name
+academic_year_col = 'Bachelor Academic Year in EU' # <-- CHANGED THIS LINE
 # ----------------------------------------------------------------------
 
 st.subheader("Gender Distribution")
@@ -130,7 +134,7 @@ cross_tab_df = cross_tab_df.melt(
     value_name='Count'
 )
 
-colors_map = {'Male': '#4A90E2', 'Female': '#FF69B4', 'Non-Binary': '#F7DC6F', 'Other': '#95a5a6'} # Added Non-Binary color
+colors_map = {'Male': '#4A90E2', 'Female': '#FF69B4', 'Non-Binary': '#F7DC6F', 'Other': '#95a5a6'} 
 
 fig4 = px.bar(
     cross_tab_df,
@@ -262,11 +266,10 @@ else:
 
 
 # ----------------------------------------------------------------------
-# --- 7. Bar Chart: Distribution of Academic Years ---
+# --- 7. Bar Chart: Distribution of Academic Years (Uses the corrected column) ---
 st.subheader("7. Distribution of Academic Years (Student Count)")
 
-academic_year_col = 'Academic Year in EU'
-
+# Use the corrected column name defined above
 academic_year_counts_df = arts_df[academic_year_col].value_counts().reset_index()
 academic_year_counts_df.columns = ['Academic Year', 'Count']
 year_order = ['1st Year', '2nd Year', '3rd Year', '4th Year']
