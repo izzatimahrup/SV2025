@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from scipy.stats import ttest_ind # For the t-test part
+from scipy.stats import ttest_ind
 
 # --- Streamlit Configuration ---
 st.set_page_config(
@@ -10,11 +10,11 @@ st.set_page_config(
     layout="wide"
 )
 
-st.header("Arts Faculty Data Analysis and Visualization 📊", divider="blue")
+st.title("Arts Faculty Data Analysis and Visualization 📊")
 
-# --- 1. Comprehensive Data Preparation (Using example data) ---
+# --- 1. Comprehensive Data Preparation (Replace with your actual data loading) ---
 
-# Example data for demonstration purposes, now including all necessary columns
+# Example data for demonstration purposes, including all necessary columns
 data = {
     'Gender': ['Female', 'Male', 'Female', 'Non-Binary', 'Male', 'Female', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male'],
     'Arts Program': ['English', 'Philosophy', 'History', 'English', 'Philosophy', 'History', 'English', 'English', 'Philosophy', 'English', 'History', 'Philosophy'],
@@ -27,8 +27,7 @@ data = {
 }
 arts_df = pd.DataFrame(data)
 
-# --- Perform necessary data cleaning and calculation for all charts ---
-# 1. GPA Calculations (for charts 3 & 4)
+# --- Data Cleaning and Calculation for all charts ---
 gpa_cols = [col for col in arts_df.columns if "semester" in col.lower()]
 arts_df[gpa_cols] = arts_df[gpa_cols].apply(pd.to_numeric, errors='coerce')
 arts_df['Overall_Average_GPA'] = arts_df[gpa_cols].mean(axis=1, skipna=True)
@@ -37,88 +36,119 @@ arts_df['H.S.C (GPA)_norm'] = (pd.to_numeric(arts_df['H.S.C (GPA)'], errors='coe
 arts_df['Did you ever attend a Coaching center?'] = arts_df['Did you ever attend a Coaching center?'].str.strip().str.title()
 # ----------------------------------------------------------------------
 
-st.subheader("Gender Distribution")
+
+st.header("1. Gender Distribution", divider="blue")
 
 # Calculate gender counts for the initial charts
 gender_counts_df = arts_df['Gender'].value_counts().reset_index()
 gender_counts_df.columns = ['Gender', 'Count']
-
-st.write("Data summary (Gender Counts):")
 st.dataframe(gender_counts_df, hide_index=True)
 
-# ----------------------------------------------------------------------
-## 1. Gender Bar Chart
+col1, col2 = st.columns(2)
 
-st.subheader("Gender Distribution: Bar Chart")
+with col1:
+    # --- 1A. Bar Chart: Gender Distribution (Custom Colors) ---
+    st.subheader("Gender Distribution: Bar Chart")
+    custom_colors = {
+        'Male': '#3498db',    # Blue
+        'Female': '#ff69b4',   # Pink
+        'Non-Binary': '#95a5a6', # Fallback/Other gender color
+    }
+    
+    fig1a = px.bar(
+        gender_counts_df,
+        x='Gender',
+        y='Count',
+        title='<b>Distribution of Gender in Arts Faculty</b>',
+        color='Gender',
+        color_discrete_map=custom_colors,
+        template='plotly_white'
+    )
+    
+    fig1a.update_traces(
+        texttemplate='%{y}',
+        textposition='outside',
+        marker_line_color='black',
+        marker_line_width=1.5
+    )
+    
+    fig1a.update_layout(
+        xaxis={'categoryorder': 'total descending'},
+        xaxis_title='Gender',
+        yaxis_title='Count',
+        yaxis_range=[0, gender_counts_df['Count'].max() * 1.2], 
+    )
+    st.plotly_chart(fig1a, use_container_width=True)
 
-fig_bar = px.bar(
-    gender_counts_df,
-    x='Gender',
-    y='Count',
-    title='Distribution of Gender in Arts Faculty (Bar Chart)',
-    color='Gender',
-    labels={'Count': 'Number of Students', 'Gender': 'Student Gender'},
-    template='plotly_white'
-)
+with col2:
+    # --- 1B. Pie Chart: Gender Distribution ---
+    st.subheader("Gender Distribution: Pie Chart")
+    
+    fig1b = px.pie(
+        gender_counts_df,
+        names='Gender',
+        values='Count',
+        title='Distribution of Gender in Arts Faculty (Pie Chart)',
+        hole=0.4,
+        color='Gender'
+    )
+    
+    fig1b.update_traces(
+        textposition='inside',
+        textinfo='percent+label',
+        marker=dict(line=dict(color='#000000', width=1)),
+    )
+    
+    fig1b.update_layout(margin=dict(t=50, l=0, r=0, b=0))
+    st.plotly_chart(fig1b, use_container_width=True)
 
-fig_bar.update_layout(
-    xaxis={'categoryorder':'total descending'},
-    margin=dict(t=50, l=0, r=0, b=0)
-)
 
-st.plotly_chart(fig_bar, use_container_width=True)
+st.header("2. Program and Academic Year Distribution", divider="blue")
 
-# ----------------------------------------------------------------------
-## 2. Gender Pie Chart
+col3, col4 = st.columns(2)
 
-st.subheader("Gender Distribution: Pie Chart")
+with col3:
+    # --- 2A. Pie Chart: Arts Program Distribution ---
+    st.subheader("Percentage Distribution by Arts Program")
+    arts_program_counts_df = arts_df['Arts Program'].value_counts().reset_index()
+    arts_program_counts_df.columns = ['Arts Program', 'Count']
 
-fig_pie = px.pie(
-    gender_counts_df,
-    names='Gender',
-    values='Count',
-    title='Distribution of Gender in Arts Faculty (Pie Chart)',
-    hole=0.4,
-    color='Gender'
-)
+    fig2a = px.pie(
+        arts_program_counts_df,
+        names='Arts Program',
+        values='Count',
+        title='Percentage Distribution of Students by Arts Program',
+        hole=0.3,
+        color_discrete_sequence=px.colors.sequential.Agsunset
+    )
+    fig2a.update_traces(textposition='inside', textinfo='percent+label')
+    st.plotly_chart(fig2a, use_container_width=True)
+    
+with col4:
+    # --- 2B. Bar Chart: Distribution of Academic Years ---
+    st.subheader("Distribution of Academic Years")
+    academic_year_col = 'Academic Year in EU'
+    academic_year_counts_df = arts_df[academic_year_col].value_counts().reset_index()
+    academic_year_counts_df.columns = ['Academic Year', 'Count']
+    year_order = ['1st Year', '2nd Year', '3rd Year', '4th Year']
 
-fig_pie.update_traces(
-    textposition='inside',
-    textinfo='percent+label',
-    marker=dict(line=dict(color='#000000', width=1)),
-)
+    fig2b = px.bar(
+        academic_year_counts_df,
+        x='Academic Year',
+        y='Count',
+        title='Distribution of Academic Years for Bachelor Students',
+        category_orders={'Academic Year': year_order},
+        color='Academic Year',
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
 
-fig_pie.update_layout(
-    margin=dict(t=50, l=0, r=0, b=0)
-)
+    fig2b.update_traces(texttemplate='%{y}', textposition='outside')
+    fig2b.update_layout(xaxis_title='Academic Year', yaxis_title='Number of Students')
+    st.plotly_chart(fig2b, use_container_width=True)
 
-st.plotly_chart(fig_pie, use_container_width=False)
 
-st.markdown("---")
-st.header("Advanced Program and Performance Analysis 🔬")
-
-# ----------------------------------------------------------------------
-# --- 3. Pie Chart: Arts Program Distribution ---
-st.subheader("3. Percentage Distribution of Students by Arts Program")
-
-arts_program_counts_df = arts_df['Arts Program'].value_counts().reset_index()
-arts_program_counts_df.columns = ['Arts Program', 'Count']
-
-fig3 = px.pie(
-    arts_program_counts_df,
-    names='Arts Program',
-    values='Count',
-    title='Percentage Distribution of Students by Arts Program',
-    hole=0.3,
-    color_discrete_sequence=px.colors.sequential.Agsunset
-)
-fig3.update_traces(textposition='inside', textinfo='percent+label')
-
-st.plotly_chart(fig3, use_container_width=True)
-
-# ----------------------------------------------------------------------
-# --- 4. Stacked Bar Chart: Arts Program Distribution by Gender ---
-st.subheader("4. Arts Program Distribution by Gender (Stacked Bar)")
+# --- 2C. Stacked Bar Chart: Arts Program Distribution by Gender ---
+st.subheader("2C. Arts Program Distribution by Gender (Stacked Bar)")
 
 cross_tab_df = pd.crosstab(arts_df['Arts Program'], arts_df['Gender']).reset_index()
 cross_tab_df = cross_tab_df.melt(
@@ -127,18 +157,18 @@ cross_tab_df = cross_tab_df.melt(
     value_name='Count'
 )
 
-colors_map = {'Male': '#4A90E2', 'Female': '#FF69B4', 'Non-Binary': '#F7DC6F'} # Added Non-Binary color
+colors_map_stacked = {'Male': '#4A90E2', 'Female': '#FF69B4', 'Non-Binary': '#F7DC6F'} 
 
-fig4 = px.bar(
+fig2c = px.bar(
     cross_tab_df,
     x='Arts Program',
     y='Count',
     color='Gender',
     title='Arts Program Distribution by Gender',
-    color_discrete_map=colors_map
+    color_discrete_map=colors_map_stacked
 )
 
-fig4.update_layout(
+fig2c.update_layout(
     xaxis_title='Arts Program',
     yaxis_title='Number of Students',
     barmode='stack',
@@ -146,13 +176,14 @@ fig4.update_layout(
     uniformtext_mode='hide'
 )
 
-st.plotly_chart(fig4, use_container_width=True)
+st.plotly_chart(fig2c, use_container_width=True)
 
-# ----------------------------------------------------------------------
-# --- 5. Line Chart: Normalized GPA Comparison ---
-st.subheader("5. Normalized GPA Comparison: S.S.C → H.S.C → University")
 
-# Melt the data into long format
+st.header("3. GPA Performance Analysis", divider="blue")
+
+# --- 3A. Line Chart: Normalized GPA Comparison ---
+st.subheader("3A. Normalized GPA Comparison: S.S.C → H.S.C → University")
+
 gpa_long = arts_df.melt(
     value_vars=['S.S.C (GPA)_norm', 'H.S.C (GPA)_norm', 'Overall_Average_GPA'],
     var_name='Level',
@@ -168,16 +199,14 @@ gpa_long['Level'] = gpa_long['Level'].replace(level_map)
 gpa_long['Level'] = pd.Categorical(
     gpa_long['Level'], categories=level_map.values(), ordered=True
 )
-
 avg_gpa_df = gpa_long.groupby('Level', observed=True)['GPA'].mean().reset_index()
 
-# Create figure using go.Figure for layering
-fig5 = go.Figure()
+fig3a = go.Figure()
 
 # Individual Student Trends (Light gray lines)
 for i, row in arts_df.iterrows():
     gpas = [row['S.S.C (GPA)_norm'], row['H.S.C (GPA)_norm'], row['Overall_Average_GPA']]
-    fig5.add_trace(go.Scatter(
+    fig3a.add_trace(go.Scatter(
         x=list(level_map.values()),
         y=gpas,
         mode='lines',
@@ -187,7 +216,7 @@ for i, row in arts_df.iterrows():
     ))
 
 # Average GPA Line + Points (Blue line)
-fig5.add_trace(go.Scatter(
+fig3a.add_trace(go.Scatter(
     x=avg_gpa_df['Level'],
     y=avg_gpa_df['GPA'],
     mode='lines+markers+text',
@@ -198,26 +227,23 @@ fig5.add_trace(go.Scatter(
     name='Average GPA'
 ))
 
-fig5.update_layout(
+fig3a.update_layout(
     title='Normalized GPA Comparison: S.S.C → H.S.C → University (4.0 Scale)',
     xaxis_title='Education Level',
     yaxis_title='Normalized GPA (4.0 Scale)',
     yaxis_range=[0, 4.1]
 )
-fig5.update_yaxes(tickvals=[0, 1, 2, 3, 4])
+fig3a.update_yaxes(tickvals=[0, 1, 2, 3, 4])
+st.plotly_chart(fig3a, use_container_width=True)
 
-st.plotly_chart(fig5, use_container_width=True)
-
-# ----------------------------------------------------------------------
-# --- 6. Bar Chart: Average Overall GPA by Coaching Attendance ---
-st.subheader("6. Average Overall GPA: Coaching Center vs Non-Coaching Students")
+# --- 3B. Bar Chart: Average Overall GPA by Coaching Attendance ---
+st.subheader("3B. Average Overall GPA: Coaching Center vs Non-Coaching Students")
 
 avg_gpa_overall = arts_df.groupby('Did you ever attend a Coaching center?')['Overall_Average_GPA'].mean().reset_index()
 order = ['Yes', 'No']
-
 palette_colors = {'Yes': '#2ecc71', 'No': '#e74c3c'}
 
-fig6 = px.bar(
+fig3b = px.bar(
     avg_gpa_overall,
     x='Did you ever attend a Coaching center?',
     y='Overall_Average_GPA',
@@ -227,28 +253,27 @@ fig6 = px.bar(
     color_discrete_map=palette_colors
 )
 
-fig6.update_traces(texttemplate='%{y:.2f}', textposition='outside')
-fig6.update_layout(
+fig3b.update_traces(texttemplate='%{y:.2f}', textposition='outside')
+fig3b.update_layout(
     xaxis_title='Attended Coaching Center',
     yaxis_title='Average Overall GPA',
     yaxis_range=[0, 4]
 )
 
-st.plotly_chart(fig6, use_container_width=True)
+st.plotly_chart(fig3b, use_container_width=True)
 
 # --- Statistical Test Output ---
 st.caption("Statistical Analysis (T-test)")
 yes_group = arts_df[arts_df['Did you ever attend a Coaching center?'] == 'Yes']['Overall_Average_GPA'].dropna()
 no_group = arts_df[arts_df['Did you ever attend a Coaching center?'] == 'No']['Overall_Average_GPA'].dropna()
 
-# Check if both groups have enough samples
 if len(yes_group) > 1 and len(no_group) > 1:
     t_stat, p_value = ttest_ind(yes_group, no_group, equal_var=False)
     
-    st.write(f"Average GPA (Coaching Yes): {yes_group.mean():.3f}")
-    st.write(f"Average GPA (Coaching No): {no_group.mean():.3f}")
-    st.write(f"T-statistic = {t_stat:.3f}")
-    st.write(f"P-value = {p_value:.4f}")
+    st.text(f"Average GPA (Coaching Yes): {yes_group.mean():.3f}")
+    st.text(f"Average GPA (Coaching No): {no_group.mean():.3f}")
+    st.text(f"T-statistic = {t_stat:.3f}")
+    st.text(f"P-value = {p_value:.4f}")
 
     if p_value < 0.05:
         st.success("✅ The difference between groups is statistically significant (p < 0.05).")
@@ -256,32 +281,3 @@ if len(yes_group) > 1 and len(no_group) > 1:
         st.info("⚖️ No statistically significant difference between coaching and non-coaching students.")
 else:
     st.warning("Insufficient data points in one or both coaching groups to perform a reliable T-test.")
-
-
-# ----------------------------------------------------------------------
-# --- 7. Bar Chart: Distribution of Academic Years ---
-st.subheader("7. Distribution of Academic Years (Student Count)")
-
-academic_year_col = 'Academic Year in EU'
-
-academic_year_counts_df = arts_df[academic_year_col].value_counts().reset_index()
-academic_year_counts_df.columns = ['Academic Year', 'Count']
-year_order = ['1st Year', '2nd Year', '3rd Year', '4th Year']
-
-fig7 = px.bar(
-    academic_year_counts_df,
-    x='Academic Year',
-    y='Count',
-    title='Distribution of Academic Years for Bachelor Students in Arts Faculty',
-    category_orders={'Academic Year': year_order},
-    color='Academic Year',
-    color_discrete_sequence=px.colors.qualitative.Pastel
-)
-
-fig7.update_traces(texttemplate='%{y}', textposition='outside')
-fig7.update_layout(
-    xaxis_title='Academic Year',
-    yaxis_title='Number of Students'
-)
-
-st.plotly_chart(fig7, use_container_width=True)
