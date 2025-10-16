@@ -329,3 +329,14 @@ if academic_year_col:
 
 else:
     st.warning("⚠️ Could not find a suitable 'Academic Year in EU' column in the dataset using the auto-detection logic.")
+
+st.markdown("---") # Separator line for visual clarity
+st.header("Overall Data Interpretation and Key Findings 🔍")
+
+final_interpretation = """
+The overall analysis of the Arts Faculty data reveals several key insights: the academic population is dominated by **female students** (63 in the summary data) and is heavily concentrated at the entry level, with **79 of the 103 total students** enrolled in the 1st and 2nd years (24 and 55, respectively), suggesting high recent intake or high attrition/transfer rates in later years. Crucially, the data shows **no statistically significant difference** in overall university GPA between students who attended a coaching center ($3.418$) and those who did not ($3.295$), as evidenced by a P-value of $0.2598$, indicating that external coaching does not reliably boost undergraduate academic success. 
+"""
+
+# Use st.markdown to display the text, allowing for formatting like bold text.
+st.markdown(final_interpretation)
+
