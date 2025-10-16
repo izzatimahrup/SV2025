@@ -266,30 +266,72 @@ else:
 
 
 # --- 5. Bar Chart: Distribution of Academic Years ---
-st.subheader("5. Distribution of Academic Years (Student Count)")
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+# Assuming arts_df is already loaded and available from your URL code
 
-# Identify column (using placeholder name)
-academic_year_col = 'Bachelor Academic Year in EU'
+# --- Academic Year Distribution Chart (Plotly Conversion with Auto-Detection) ---
 
-# Prepare data
-academic_year_counts_df = arts_df[academic_year_col].value_counts().reset_index()
-academic_year_counts_df.columns = ['Academic Year', 'Count']
-year_order = ['1st Year', '2nd Year', '3rd Year', '4th Year']
+st.subheader("Distribution of Academic Years (Student Count) 🎓")
 
-fig5 = px.bar(
-    academic_year_counts_df,
-    x='Academic Year',
-    y='Count',
-    title='Distribution of Academic Years for Bachelor Students in Arts Faculty',
-    category_orders={'Academic Year': year_order},
-    color='Academic Year', # Assign colors by year
-    color_discrete_sequence=px.colors.qualitative.Pastel # Pastel palette
-)
+# Try to find the correct column automatically (using the provided logic)
+academic_year_col = None
+for col in arts_df.columns:
+    if 'academic year' in col.lower() and 'eu' in col.lower():
+        academic_year_col = col
+        break
 
-fig5.update_traces(texttemplate='%{y}', textposition='outside') # Add value labels
-fig5.update_layout(
-    xaxis_title='Academic Year',
-    yaxis_title='Number of Students'
-)
+if academic_year_col:
+    # 1. Count occurrences and convert to DataFrame
+    academic_year_counts = arts_df[academic_year_col].value_counts()
+    academic_year_df = academic_year_counts.reset_index()
+    academic_year_df.columns = ['Academic Year', 'Count']
 
-st.plotly_chart(fig5, use_container_width=True)
+    # 2. Define and apply the correct sequence/ordering
+    year_order = ['1st Year', '2nd Year', '3rd Year', '4th Year']
+    
+    # Apply Categorical type for robust sorting and consistency
+    academic_year_df['Academic Year'] = pd.Categorical(
+        academic_year_df['Academic Year'],
+        categories=year_order,
+        ordered=True
+    )
+    # Filter the DataFrame to only include the defined categories (removes garbage data)
+    academic_year_df = academic_year_df.dropna(subset=['Academic Year']).sort_values('Academic Year')
+
+
+    # 3. Create the Plotly Bar Chart
+    fig = px.bar(
+        academic_year_df,
+        x='Academic Year',
+        y='Count',
+        title='Distribution of Academic Years for Bachelor Students in Arts Faculty',
+        category_orders={'Academic Year': year_order}, # Ensures correct sorting
+        color='Academic Year',
+        color_discrete_sequence=px.colors.qualitative.Pastel # Using Plotly's Pastel palette
+    )
+
+    # 4. Add value indicators (count labels above the bars)
+    fig.update_traces(
+        texttemplate='%{y}',           # Use the Y value (Count) as the label text
+        textposition='outside',        # Place the text outside (above) the bar
+        marker_line_color='black',
+        marker_line_width=1.5
+    )
+
+    # 5. Customize Layout
+    fig.update_layout(
+        xaxis_title='Academic Year',
+        yaxis_title='Number of Students',
+        yaxis_range=[0, academic_year_df['Count'].max() * 1.1] # Ensure space for labels
+    )
+    
+    # Optional: Display which column was used
+    st.caption(f"Visualization generated using column: **{academic_year_col}**")
+
+    # Display the chart in Streamlit
+    st.plotly_chart(fig, use_container_width=True)
+
+else:
+    st.warning("⚠️ Could not find a suitable 'Academic Year in EU' column in the dataset using the auto-detection logic.")
