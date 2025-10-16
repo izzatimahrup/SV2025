@@ -280,4 +280,6 @@ if len(yes_group) > 1 and len(no_group) > 1:
     if p_value < 0.05:
         st.success("✅ The difference between groups is statistically significant (p < 0.05).")
     else:
-        st.info("⚖️ No statistically significant difference between coaching and non-coaching students
+        st.info("⚖️ No statistically significant difference between coaching and non-coaching students.")
+else:
+    st.warning("Insufficient data points in one or both coaching groups to perform a reliable T-test.")
