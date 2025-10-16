@@ -265,29 +265,31 @@ else:
     st.warning("Insufficient data points in one or both coaching groups to perform a reliable T-test.")
 
 
-# ----------------------------------------------------------------------
-# --- 7. Bar Chart: Distribution of Academic Years (Uses the corrected column) ---
-st.subheader("7. Distribution of Academic Years (Student Count)")
+# --- 5. Bar Chart: Distribution of Academic Years ---
+st.subheader("5. Distribution of Academic Years (Student Count)")
 
-# Use the corrected column name defined above
+# Identify column (using placeholder name)
+academic_year_col = 'Bachelor Academic Year in EU'
+
+# Prepare data
 academic_year_counts_df = arts_df[academic_year_col].value_counts().reset_index()
 academic_year_counts_df.columns = ['Academic Year', 'Count']
 year_order = ['1st Year', '2nd Year', '3rd Year', '4th Year']
 
-fig7 = px.bar(
+fig5 = px.bar(
     academic_year_counts_df,
     x='Academic Year',
     y='Count',
     title='Distribution of Academic Years for Bachelor Students in Arts Faculty',
     category_orders={'Academic Year': year_order},
-    color='Academic Year',
-    color_discrete_sequence=px.colors.qualitative.Pastel
+    color='Academic Year', # Assign colors by year
+    color_discrete_sequence=px.colors.qualitative.Pastel # Pastel palette
 )
 
-fig7.update_traces(texttemplate='%{y}', textposition='outside')
-fig7.update_layout(
+fig5.update_traces(texttemplate='%{y}', textposition='outside') # Add value labels
+fig5.update_layout(
     xaxis_title='Academic Year',
     yaxis_title='Number of Students'
 )
 
-st.plotly_chart(fig7, use_container_width=True)
+st.plotly_chart(fig5, use_container_width=True)
