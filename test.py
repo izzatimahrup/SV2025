@@ -1,26 +1,17 @@
+
 import streamlit as st
 
-# --- Page Configuration ---
 st.set_page_config(
-    page_title="Student Survey",
-    page_icon="🎓",
-    layout="wide"
+    page_title="Student Survey"
 )
 
-# --- Sidebar Navigation (acts as your Menu) ---
-pg = st.sidebar.radio(
-    "Menu",
-    ["Homepage", "Pencapaian Akademik"]
+visualise = st.Page('studentSurvey.py', title='Pencapaian Akademik', icon='material/school:')
+home = st.Page('home.py', title='Homepage', default=True, icon='material/home:')
+
+pg = st.navigation(
+    {
+        "Menu": [home, visualise]
+    }
 )
 
-# --- Homepage ---
-if pg == "Homepage":
-    st.title("🏠 Homepage")
-    st.write("Welcome to the Student Survey application.")
-    st.write("Use the menu on the left to navigate between pages.")
-
-# --- Pencapaian Akademik ---
-elif pg == "Pencapaian Akademik":
-    st.title("🎓 Pencapaian Akademik")
-    st.write("This page shows academic achievement visualization.")
-    st.write("You can add graphs, data, or analysis here later.")
+pg.run()
