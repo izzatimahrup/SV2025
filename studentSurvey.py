@@ -23,13 +23,13 @@ try:
 except Exception as e:
     st.error(f"An error occurred while reading the CSV from the URL: {e}")
     st.stop() # Stop the app if data loading fails
-# ######################################################################
-  
 
-# --- Perform necessary data cleaning and calculation for all charts ---
+col1,col2,col3,col4 = st.columns(4)
 
-
-# --- Perform necessary data cleaning and calculation for all charts ---
+col1.metric(label="PLO 2", value-f"3.3", help="PLO 2: Cognitive Skill", border=True)
+col1.metric(label="PLO 3", value-f"3.5", help="PLO 3: Digital Skill", border=True)
+col1.metric(label="PLO 4", value-f"4.0", help="PLO 4: Interpersonal Skill", border=True)
+ col1.metric(label="PLO 5", value-f"4.3", help="PLO 5: Communication SKill", border=True)
 
 # 1. GPA Calculations
 gpa_cols = [col for col in arts_df.columns if "semester" in col.lower()]
