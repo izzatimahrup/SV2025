@@ -4,9 +4,9 @@ st.set_page_config(
     page_title="Student Survey"
 )
 
-visualise = st.Page('studentSurvey.py', title='Pencapaian Akademik Pelajar', icon=":material/school:")
+visualise = st.Page('studentSurvey.py', title='Pencapaian Akademik Pelajar', icon=':material/school:')
 
-home = st.Page('home.py', title='HomePage', default-True, icon=":material/home:")
+home = st.Page('home.py', title='HomePage', default-True, icon=':material/home:')
 
 pg = st.navigation(
     {
