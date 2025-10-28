@@ -16,15 +16,6 @@ st.header("Arts Faculty Data Analysis and Visualization 📊", divider="blue")
 # --- 1. DATA LOADING FROM URL ---
 url = 'https://raw.githubusercontent.com/izzatimahrup/SV2025/refs/heads/main/arts_student_survey_output.csv'
 
-try:
-    # Load the CSV directly from the URL and assign it to arts_df
-    arts_df = pd.read_csv(url)
-    st.success("Data loaded successfully from GitHub URL!")
-except Exception as e:
-    st.error(f"An error occurred while reading the CSV from the URL: {e}")
-    st.stop() # Stop the app if data loading fails
-# ######################################################################
-
 
 # --- Perform necessary data cleaning and calculation for all charts ---
 
