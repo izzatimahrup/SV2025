@@ -6,7 +6,7 @@ st.set_page_config(
 
 visualise = st.Page('studentSurvey.py', title='Pencapaian Akademik Pelajar', icon=':material/school:')
 
-home = st.page('home.py', title='HomePage', default=True, icon=':material/school:')
+home = st.Page('home.py', title='HomePage', default=True, icon=':material/school:')
 
 
 
