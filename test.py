@@ -1,4 +1,3 @@
-from streamlit_navigation import Page, Navigation
 import streamlit as st 
 
 st.set_page_config(
@@ -11,7 +10,7 @@ home = st.page('home.py', title='HomePage', default=True, icon=':material/school
 
 
 
-pg = st.navigation(
+pg = st.navigation (
     {
         "Menu" : [home, visualise]
     }
