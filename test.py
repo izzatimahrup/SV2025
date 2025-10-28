@@ -1,3 +1,4 @@
+from streamlit_navigation import Page, Navigation
 import streamlit as st 
 
 st.set_page_config(
